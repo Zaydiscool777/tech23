@@ -3,6 +3,7 @@ here = None
 doing = None
 f = open("data.csv", 'r+')
 read = [i[1] for i in csv.reader(f)]
+places = {}
 
 def ask(*options: tuple, question="What do you do?", other="") -> str:
     print("\t\b", question, '\n\t')
@@ -22,7 +23,7 @@ class Action:
             print(self.str)
         going(ask(*self.opt, self.question)) if not self.question == None else going(ask(*self.opt))
 class Scene(Action):
-    def __init__(self, nickname, desc, next):
+    def __init__(self, nickname: str, desc: str, next=None):
         super().__init__(nickname, desc, next, True)
         self.question = f"Where do you want to go from {self.nickname}?"
     def forth(self, to):
@@ -31,7 +32,24 @@ class Scene(Action):
         self.forth(to)
         to.forth(self)
 
-def do(where):
-    here = where
+def do(where=read[0], doingp=read[1]):
+    print("...") #oh no dont leave
+    global here
+    global doing
+    global f
+    read[0] = (here := where)
+    read[1] = (doing := doingp)
+    f.truncate(0)
+    csv.writer(f).writerow("location", read[0])
+    csv.writer(f).writerow("action", read[1])
+    print('')#ok now
 
-        
+g = open('obj.py')    
+exec(g.read())
+g.close()
+    
+def step():
+    pass
+
+#do(1, 2)
+#print(here)
