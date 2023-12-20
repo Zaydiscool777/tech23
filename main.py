@@ -20,7 +20,7 @@ def save(where=read[0], doingp=read[1]):
     # TODO: fix this for battle
     print('')#ok now
 # ask function
-def ask(*options: list, question="What do you do?", other="") -> str:
+def ask(options: list, question="What do you do?", other="") -> str:
     print("\t\b", question, '\n\t')
     for i in options:
         print(f"\t{i[0]}: {i[1]}")
@@ -46,22 +46,41 @@ class Action:
             print(self.str)
             #save(ask(*self.opt, self.question)) if not self.question == None else save(ask(*self.opt))
             # until save fixed
-    def __str__(self):
-        print(f"{self.id}\n{self.nickname}\nclass: {self.__class__.__name__}\n{self.str}\n{self.question} ({self.print})\n{[i.id for i in self.opt]}")
+            return ask(self.opt, self.question) if not self.question == None else ask(self.opt)
+    def about(self):
+        return f"{self.id}\n{self.nickname}\nclass: {self.__class__.__name__}\n{self.str}\n{self.question} ({self.print})\n{[i.id for i in self.opt]}"
 
 scenes = {}
 class Scene(Action):
-    def __init__(self, id: str, nickname: str, desc: str, nextl: list):
-        super().__init__(id, nickname, desc, nextl, True, scenes)
+    def __init__(self, id: str, nickname: str, desc: str, *nextl):
+        super().__init__(id, nickname, desc, [[scenes[i], scenes[i].str] for i in nextl], True, scenes)
         self.question = f"Where do you want to go from {self.nickname}?"
-        for i in nextl:
-            self.nextl.append(i)
-            i.nextl.append(self)
+        for i in [self.dict[i] for i in nextl]:
+            self.opt.append(i)
+            i.opt.append(self)
     def forth(self, to):
-        self.nextl.append(to)
+        self.opt.append(to)
     def link(self, to):
         self.forth(to)
         to.forth(self)
     
+#--- adding to the dicts  --#
+
+# switch to json? i mean... vvv
+#:village -> :village:goat -> :village:goat;milk -> :village:goat;slaughter!
+
+Scene(':village', 'the village', "A village.")
+Scene(':village:shop', 'the shop', "A shop with three merchants.", ':village')
+Scene(':village:shop:1', 'the first merchant', "A merchant that can sell various items")
+Scene(':village:shop:2', 'the second merchant', "A merchant that can sell various items", ':village:shop:1')
+Scene(':village:shop:3', 'the third merchant', "A merchant that can sell various items", ':village:shop:1', ':village:shop:2')
+
+print(scenes[':village'].about())
+x = scenes[':village']
+while True:
+    print( (x := x.next()) )
+
+#--- thank you for coming --#
+
 def step():
     pass
