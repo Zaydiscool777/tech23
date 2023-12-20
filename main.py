@@ -20,7 +20,7 @@ def save(where=read[0], doingp=read[1]):
     # TODO: fix this for battle
     print('')#ok now
 # ask function
-def ask(*options: tuple, question="What do you do?", other="") -> str:
+def ask(*options: list, question="What do you do?", other="") -> str:
     print("\t\b", question, '\n\t')
     for i in options:
         print(f"\t{i[0]}: {i[1]}")
@@ -32,7 +32,7 @@ def ask(*options: tuple, question="What do you do?", other="") -> str:
 
 actions = {}
 class Action:
-    def __init__(self, id: str, nickname: str, str: str, opt: tuple, print: bool, dict=actions) -> None:
+    def __init__(self, id: str, nickname: str, str: str, opt: list, print: bool, dict=actions) -> None:
         self.id = id
         self.nickname = nickname
         self.str = str
@@ -44,20 +44,21 @@ class Action:
     def next(self):
         if self.print:
             print(self.str)
-            save(ask(*self.opt, self.question)) if not self.question == None else save(ask(*self.opt))
+            #save(ask(*self.opt, self.question)) if not self.question == None else save(ask(*self.opt))
+            # until save fixed
     def __str__(self):
         print(f"{self.id}\n{self.nickname}\nclass: {self.__class__.__name__}\n{self.str}\n{self.question} ({self.print})\n{[i.id for i in self.opt]}")
 
 scenes = {}
 class Scene(Action):
-    def __init__(self, id: str, nickname: str, desc: str, next: tuple):
-        super().__init__(id, nickname, desc, next, True, scenes)
+    def __init__(self, id: str, nickname: str, desc: str, nextl: list):
+        super().__init__(id, nickname, desc, nextl, True, scenes)
         self.question = f"Where do you want to go from {self.nickname}?"
-        for i in next:
-            self.next.append(i)
-            i.next.append(self)
+        for i in nextl:
+            self.nextl.append(i)
+            i.nextl.append(self)
     def forth(self, to):
-        self.next.append(to)
+        self.nextl.append(to)
     def link(self, to):
         self.forth(to)
         to.forth(self)
