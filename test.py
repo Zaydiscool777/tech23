@@ -1,4 +1,5 @@
-import csv
-f = open("data.csv", 'r+')
-read = [i[1] for i in csv.reader(f)]
-print(read)
+f = open("main.py")
+exec(f.read())
+village = Scene(':village', 'the village', "A village.", ())
+village.link(village)
+print(village)

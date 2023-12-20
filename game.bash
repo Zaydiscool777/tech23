@@ -1,6 +1,2 @@
-if [ "$1" == ( "-h" | "--help" ) ]
-then
-else
-echo "Usage:  game.bash [-h | --help]"
+echo "you can type quit to quit and save"
 ./main.py
-fi

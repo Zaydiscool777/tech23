@@ -1,38 +1,13 @@
+#!/bin/python3
+
+# preparing
 import csv
 here = None
 doing = None
 f = open("data.csv", 'r+')
 read = [i[1] for i in csv.reader(f)]
-places = {}
 
-def ask(*options: tuple, question="What do you do?", other="") -> str:
-    print("\t\b", question, '\n\t')
-    for i in options:
-        print(f"\t{i[0]}: {i[1]}")
-    if (x := input('\tة<( ')) in options: return x
-    else: return other
-class Action:
-    def __init__(self, nickname: str, str: str, opt: tuple, print: bool) -> None:
-        self.nickname = nickname
-        self.str = str
-        self.opt = opt
-        self.print = print
-        self.question = "What do you want to do now?"
-    def next(self):
-        if self.print:
-            print(self.str)
-        going(ask(*self.opt, self.question)) if not self.question == None else going(ask(*self.opt))
-class Scene(Action):
-    def __init__(self, nickname: str, desc: str, next=None):
-        super().__init__(nickname, desc, next, True)
-        self.question = f"Where do you want to go from {self.nickname}?"
-    def forth(self, to):
-        self.next.append(to)
-    def link(self, to):
-        self.forth(to)
-        to.forth(self)
-
-def do(where=read[0], doingp=read[1]):
+def save(where=read[0], doingp=read[1]):
     print("...") #oh no dont leave
     global here
     global doing
@@ -42,14 +17,50 @@ def do(where=read[0], doingp=read[1]):
     f.truncate(0)
     csv.writer(f).writerow("location", read[0])
     csv.writer(f).writerow("action", read[1])
+    # TODO: fix this for battle
     print('')#ok now
+# ask function
+def ask(*options: tuple, question="What do you do?", other="") -> str:
+    print("\t\b", question, '\n\t')
+    for i in options:
+        print(f"\t{i[0]}: {i[1]}")
+    if (x := input('\tة<( ')) in options: return x
+    elif x == 'quit':
+        save()
+        exit(0)
+    else: return other
 
-g = open('obj.py')    
-exec(g.read())
-g.close()
+actions = {}
+class Action:
+    def __init__(self, id: str, nickname: str, str: str, opt: tuple, print: bool, dict=actions) -> None:
+        self.id = id
+        self.nickname = nickname
+        self.str = str
+        self.opt = opt
+        self.print = print
+        self.question = "What do you want to do now?"
+        self.dict = dict
+        self.dict[self.id] = self
+    def next(self):
+        if self.print:
+            print(self.str)
+            save(ask(*self.opt, self.question)) if not self.question == None else save(ask(*self.opt))
+    def __str__(self):
+        print(f"{self.id}\n{self.nickname}\nclass: {self.__class__.__name__}\n{self.str}\n{self.question} ({self.print})\n{[i.id for i in self.opt]}")
+
+scenes = {}
+class Scene(Action):
+    def __init__(self, id: str, nickname: str, desc: str, next: tuple):
+        super().__init__(id, nickname, desc, next, True, scenes)
+        self.question = f"Where do you want to go from {self.nickname}?"
+        for i in next:
+            self.next.append(i)
+            i.next.append(self)
+    def forth(self, to):
+        self.next.append(to)
+    def link(self, to):
+        self.forth(to)
+        to.forth(self)
     
 def step():
     pass
-
-#do(1, 2)
-#print(here)
