@@ -4,19 +4,20 @@
 import csv
 here = None
 doing = None
+battle = None
 f = open("data.csv", 'r+')
 read = [i[1] for i in csv.reader(f)]
 
-def save(where=read[0], doingp=read[1]):
+def save(where=read[0], wdoing=read[1], wbattle=read[2]):
 	print("...") #oh no dont leave
 	global here
 	global doing
 	global f
 	read[0] = (here := where)
-	read[1] = (doing := doingp)
+	read[1] = (doing := wdoing)
 	f.truncate(0)
-	csv.writer(f).writerow("location", read[0])
-	csv.writer(f).writerow("action", read[1])
+	csv.writer(f).writerow(["location", read[0]])
+	csv.writer(f).writerow(["action", read[1]])
 	# TODO: fix this for battle
 	print('')#ok now
 # ask function
@@ -24,9 +25,9 @@ def ask(options: list, question="What do you do?", other=""):
 	print("\t\b", question, '\n\t')
 	for i in options:
 		print(f"\t{i[0]}: {i[1]}")
-	if (x := input('\tة<( ')) in options: return x
+	if (x := input('\tة<( ')) in (lambda i: i[0])(options): return x
 	elif x == 'quit':
-		save()
+		#save()
 		exit(0)
 	else: return other
 
@@ -69,9 +70,13 @@ class Scene(Action):
 # switch to json? i mean... vvv
 #:village -> :village:goat -> :village:goat;milk -> :village:goat;slaughter!
 
-Scene(':village', 'the village', "A village.")
-Scene(':village:shop', 'the shop', "A shop with three merchants.", ':village')
-Scene(':village:shop:1', 'the first merchant', "A merchant that can sell various items")
+Scene(':village', 'the village',
+	"A village.")
+Scene(':village:shop', 'the shop', 
+	"A shop with three merchants.", 
+	':village')
+Scene(':village:shop:1', 'the first merchant', 
+	"A merchant that can sell various items")
 Scene(':village:shop:2', 'the second merchant',
 	"A merchant that can sell various items",
 	':village:shop:1')
