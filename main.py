@@ -24,6 +24,7 @@ def save(where=read[0], wdoing=read[1], wbattle=read[2]):
 def ask(options: list, question="What do you do?", other=""):
 	print("\t\b", question, '\n\t')
 	for i in options:
+		print(i)
 		print(f"\t{i[0]}: {i[1]}")
 	if (x := input('\tة<( ')) in (lambda i: i[0])(options): return x
 	elif x == 'quit':
@@ -49,16 +50,18 @@ class Action:
 			# until save fixed
 			return ask(self.opt, self.question) if self.question is not None else ask(self.opt)
 	def __repr__(self):
-		return f"{self.id}\n{self.nickname}\nclass: {self.__class__.__name__}\n{self.str}\n{self.question}({self.print})\n{[i.id for i in self.opt]}"
+		return f"{self.id}\n{self.nickname}\nclass: {self.__class__.__name__}\n{self.str}\n{self.question}({self.print})\n{[self.id for i in self.opt]}"
 
 scenes = {}
 class Scene(Action):
+
 	def __init__(self, id: str, nickname: str, desc: str, *nextl):
 		super().__init__(id, nickname, desc, [[scenes[i].id, scenes[i].str] for i in nextl], True, scenes)
+		print([[scenes[i].id, scenes[i].str] for i in nextl])  		
 		self.question = f"Where do you want to go from {self.nickname}?"
 		for i in [self.dict[i] for i in nextl]:
-			self.opt.append(i)
-			i.opt.append(self)
+			self.opt.append([i.id, i.str])
+			i.opt.append([self.id, self.str])
 	def forth(self, to):
 		self.opt.append(to)
 	def link(self, to):
@@ -84,10 +87,10 @@ Scene(':village:shop:3', 'the third merchant',
 	"A merchant that can sell various items",
 	':village:shop:1', ':village:shop:2')
 
+
 print(scenes[':village'].__repr__())
 x = scenes[':village']
-#while True:
-#	print( (x := scenes[x.next()]) )
+print(x.next())
 
 #--- thank you for coming --#
 
