@@ -10,13 +10,13 @@ def save(*save):
 	print("...") #oh no dont leave
 	global write
 	for i in enumerate(save):
-		read[i[0]] = (write[i[0]] := i[1])
+		write[i[0]] = i[1]; read[i[0]] = write[i[0]] # what happened to mr. walrus
 	f.truncate(0)
 	csv.writer(f).writerow(["location", read[0]])
 	csv.writer(f).writerow(["action", read[1]])
 	csv.writer(f).writerow(["battle", *read[2]])
 	csv.writer(f).writerow(["inventory", *read[3]])
-	# TODO: fix this for battle
+	# TODO: fix everything else for battle
 	print('')#ok now
 # ask function
 def ask(options: list, question="What do you do?", other=""):
@@ -24,10 +24,8 @@ def ask(options: list, question="What do you do?", other=""):
 	for i in options:
 		print(i)
 		print(f"\t{i[0]}: {i[1]}")
-	if (x := input('\tة<( ')) in (lambda i: i[0])(options): return x
-	elif x == 'quit':
-		#save()
-		exit(0)
+	if (x := input('\tة<( ')) in [i[0] for i in options]: return x
+	elif x == 'quit': save(*write); exit(0) # 
 	else: return other
 
 actions = {}
@@ -52,7 +50,6 @@ class Action:
 
 scenes = {}
 class Scene(Action):
-
 	def __init__(self, id: str, nickname: str, desc: str, *nextl):
 		super().__init__(id, nickname, desc, [[scenes[i].nick, scenes[i].str] for i in nextl], True, scenes)
 		print([[scenes[i].nickname, scenes[i].str] for i in nextl])  		
@@ -90,4 +87,5 @@ Scene(':village:shop:3', 'the third merchant',
 #--- thank you for coming --#
 
 def step():
-	pass
+	if write[2] != []:
+		pass
