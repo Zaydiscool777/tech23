@@ -2,6 +2,8 @@
 
 # preparing
 import csv
+from typing import Any
+
 write = [None, None, [], []]
 f = open("data.csv", 'r+')
 read = [i[1] for i in csv.reader(f)]
@@ -46,7 +48,7 @@ class Action:
 			return self.dict[ask(self.opt, self.question) if self.question is not None else ask(self.opt)]
 	def __repr__(self):
 		return f"{self.id}\n{self.nickname}\nclass: {self.__class__.__name__}\n\
-    	{self.str}\n{self.question}({self.print})\n{[self.id for i in self.opt]}"
+		{self.str}\n{self.question}({self.print})\n{[self.id for i in self.opt]}"
 
 scenes = {}
 class Scene(Action):
@@ -62,20 +64,28 @@ class Scene(Action):
 	def link(self, to):
 		self.forth(to)
 		to.forth(self)
-idk = {}
+attacks = {}
 class Attack(Action):
 	def __init__(self, id: str, name: str, desc: str, does: list):
-		super().__init__(id, name, desc, [], False, idk)
-		self.init = False
-	def __call__(self, is_op: bool):
-		if not self.init:
-			self.init = True
-			return 0
-		return [i[1] + does[i[0]] for i in enumerate(write[3])]
+		super().__init__(id, name, desc, [], False, attacks)
+		self.does = does
+	def __call__(self, opp=False):
+		if opp:
+			return [[i[1] + self.does[i[0]] for i in enumerate(write[3])][i:i+2] for i in range(0, len([i[1] + self.does[i[0]] for i in enumerate(write[3])]), 2)]
+		return [i[1] + self.does[i[0]] for i in enumerate(write[3])]
+
+# dont even try to think of it
 opps = {}
 class Battle(Action):
-	def __init__(self, id: str, name: str, desc="yea", *attacks):
-		super().__init__(id, name, desc, attacks, False, opps)
+	def __init__(self, id: str, name: str, desc="yea", *opp):
+		super().__init__(id, name, desc, opp, False, opps)
+	def __call__(self):
+		while write[3][0] > 0 and write[3][1] > 0: # no one's dead
+			ask()
+			
+		
+		
+
 
 #--- adding to the dicts  --#
 
@@ -99,6 +109,7 @@ def SET():
 
 
 #--- thank you for coming --#
+
 SET()
 def step():
 	if write[2] != []:
