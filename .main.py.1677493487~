@@ -2,7 +2,6 @@
 
 # preparing
 import csv
-from random import randrange as random
 
 write = [None, None, [], []]
 f = open("data.csv", 'r+')
@@ -43,7 +42,7 @@ class Action:
 	def next(self):
 		if self.print:
 			print(self.str)
-			save(ask(self.opt, question=self.question)) if self.question is not None else save(ask(self.opt))
+			save(ask(self.opt, self.question)) if not self.question == None else save(ask(*self.opt))
 			# until save fixed
 			return self.dict[ask(self.opt, self.question) if self.question is not None else ask(self.opt)]
 	def __repr__(self):
@@ -71,19 +70,18 @@ class Attack(Action):
 		self.does = does
 	def __call__(self, opp=False):
 		if opp:
-			return [[i[1] + self.does[i[0]] for i in enumerate(write[3])][i:i+2] for i in \
-				range(0, len([i[1] + self.does[i[0]] for i in enumerate(write[3])]), 2)] # pluh
+			return [[i[1] + self.does[i[0]] for i in enumerate(write[3])][i:i+2] for i in range(0, len([i[1] + self.does[i[0]] for i in enumerate(write[3])]), 2)]
 		return [i[1] + self.does[i[0]] for i in enumerate(write[3])]
+
+# dont even try to think of it
 opps = {}
 class Battle(Action):
 	def __init__(self, id: str, name: str, desc="yea", *opp):
-		opp = list(opp)
 		super().__init__(id, name, desc, opp, False, opps)
 	def __call__(self):
 		while write[3][0] > 0 and write[3][1] > 0: # no one's dead
 			print(f"Your HP: {write[3][0]}\nOpponent's HP: {write[3][1]}")
-			attacks[self.next()]()
-			attacks[random(len(attacks))](True)
+			action[self.next()]
 
 
 
