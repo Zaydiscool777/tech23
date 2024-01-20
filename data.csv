@@ -1,4 +1,4 @@
 location,:village
 action,;
-battle,10,,,
-inventory
+battle,10,0
+youractions,

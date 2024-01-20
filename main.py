@@ -4,20 +4,20 @@
 import csv
 from random import randrange as random
 
-write = [None, None, [], []]
+write = [None, None, [10, 0], []]
 f = open("data.csv", 'r+')
 read = [i[1] for i in csv.reader(f)]
 
 def save(*save):
 	print("...") #oh no dont leave
 	global write
-	for i in enumerate(save):
+	for i in save:
 		write[i[0]] = i[1]; read[i[0]] = write[i[0]] # what happened to mr. walrus
 	f.truncate(0)
 	csv.writer(f).writerow(["location", read[0]])
 	csv.writer(f).writerow(["action", read[1]])
 	csv.writer(f).writerow(["battle", *read[2]])
-	csv.writer(f).writerow(["inventory", *read[3]])
+	csv.writer(f).writerow(["youractions", *read[3]])
 	# TODO: fix everything else for battle
 	print('')#ok now
 # ask function
@@ -53,7 +53,7 @@ class Action:
 scenes = {}
 class Scene(Action):
 	def __init__(self, id: str, nickname: str, desc: str, *nextl):
-		super().__init__(id, nickname, desc, [[scenes[i].nick, scenes[i].str] for i in nextl], True, scenes)		
+		super().__init__(id, nickname, desc, [[scenes[i].nickname, scenes[i].str] for i in nextl], True, scenes)		
 		self.question = f"Where do you want to go from {self.nickname}?"
 		for i in [self.dict[i] for i in nextl]:
 			# i finally fixed it!!!
@@ -64,6 +64,7 @@ class Scene(Action):
 	def link(self, to):
 		self.forth(to)
 		to.forth(self)
+
 attacks = {}
 class Attack(Action):
 	def __init__(self, id: str, name: str, desc: str, does: list):
@@ -74,16 +75,21 @@ class Attack(Action):
 			return [[i[1] + self.does[i[0]] for i in enumerate(write[3])][i:i+2] for i in \
 				range(0, len([i[1] + self.does[i[0]] for i in enumerate(write[3])]), 2)] # pluh
 		return [i[1] + self.does[i[0]] for i in enumerate(write[3])]
+
 opps = {}
+youractions = write[3]
 class Battle(Action):
-	def __init__(self, id: str, name: str, desc="yea", *opp):
-		opp = list(opp)
-		super().__init__(id, name, desc, opp, False, opps)
+	def __init__(self, id: str, name: str, desc="yea", set=[0], *opp):
+		self.opp = list(opp)
+		self.set = set
+		super().__init__(id, name, desc, youractions, False, opps)
 	def __call__(self):
-		while write[3][0] > 0 and write[3][1] > 0: # no one's dead
-			print(f"Your HP: {write[3][0]}\nOpponent's HP: {write[3][1]}")
-			attacks[self.next()]()
-			attacks[random(len(attacks))](True)
+		for i in range(1, len(write[2]), 2):
+			write[2][i] = 
+		while write[2][0] > 0 and write[2][1] > 0: # no one's dead
+			print(f"Your HP: {write[2][0]}\nOpponent's HP: {write[2][1]}")
+			attacks[ask(youractions)]()
+			attacks[random(len(self.opp))](True)
 
 
 
@@ -106,11 +112,20 @@ def SET():
 	Scene(':village:shop:3', 'the third merchant', 
 		"A merchant that can sell various items",
 		':village:shop:1', ':village:shop:2', ':village:shop')
+	Attack('punch', 'a punch', 'A simple punch, deals 1 dmg. to opp.', [0, -1])
+	Battle(':village;wolf!', 'the wolf', 'A wolf. Can deal a punch.')
+	scenes[':village'].forth(opps[':village;wolf!'])
 
 
 #--- thank you for coming --#
 
 SET()
 def step():
-	if write[2] != []:
-		pass
+	loc = scenes[':village']
+	here = loc
+	if write[2][0] == 0:
+		exit()
+	else:
+		here = loc.next()
+		if here not in opps: 
+			loc = here
